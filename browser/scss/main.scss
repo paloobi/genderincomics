@@ -19,6 +19,13 @@ body {
   margin: 0 auto;
 }
 
+.circle {
+  width: 40px;
+  height: 40px;
+  background-color: blue;
+  border-radius: 100%;
+}
+
 @import 'directives/main';
 @import 'home/main';
 @import 'about/main';
