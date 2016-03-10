@@ -1,4 +1,12 @@
 #home {
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  stats {
+
+  }
   logo {
     padding-top: 30px;
     width: 150px;
