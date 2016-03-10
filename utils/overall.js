@@ -41,10 +41,6 @@ var other = requestPromise({
   }
 })
 
-function getPercent(num, total) {
-  return Math.round(num / total * 100)
-}
-
 module.exports = Promise.all([females, males, other])
 .then(function(results) {
   console.log(chalk.green('\nRetrieved results from API\n--------------------------'));
@@ -59,9 +55,9 @@ module.exports = Promise.all([females, males, other])
   });
   var total = counts[0] + counts[1] + counts[2];
   var stats = {
-    female: getPercent(counts[0], total),
-    male: getPercent(counts[1], total),
-    other: getPercent(counts[2], total)
+    female: counts[0],
+    male: counts[1],
+    other: counts[2]
   }
   return stats;
 })
