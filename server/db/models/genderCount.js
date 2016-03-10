@@ -4,7 +4,8 @@ var mongoose = require('mongoose');
 
 var schema = new mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        unique: true
     },
     female: {
         type: Number
