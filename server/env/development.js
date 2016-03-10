@@ -1,5 +1,5 @@
 module.exports = {
-  "DATABASE_URI": "mongodb://localhost:27017/fsg-app",
+  "DATABASE_URI": "mongodb://localhost:27017/comicGender",
   "SESSION_SECRET": "Optimus Prime is my real dad",
   "TWITTER": {
     "consumerKey": "INSERT_TWITTER_CONSUMER_KEY_HERE",
@@ -17,7 +17,7 @@ module.exports = {
     "callbackURL": "INSERT_GOOGLE_CALLBACK_HERE"
   },
   "COMIC_VINE": {
-    "APIKEY": "48f39272e4a344376bf34fb0659c0d97e82205aa",
-    "BASEURI": "http://comicvine.gamespot.com/api/"
+    "API_KEY": "48f39272e4a344376bf34fb0659c0d97e82205aa",
+    "BASE_URL": "http://comicvine.gamespot.com/api"
   }
 };

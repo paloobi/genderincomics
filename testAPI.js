@@ -16,7 +16,7 @@ var fs = require('fs');
 //   })
 
 request({
-    url: 'http://comicvine.gamespot.com/api/characters/?api_key=48f39272e4a344376bf34fb0659c0d97e82205aa&format=json&limit=1&filter=gender:female',
+    url: 'http://comicvine.gamespot.com/api/characters/?api_key=48f39272e4a344376bf34fb0659c0d97e82205aa&format=json&filter=gender:female',
     headers: {
       'User-Agent': 'paloobi'
     }
