@@ -4,7 +4,6 @@ An analysis of gender representation in superhero comics, and how gender correla
 
 Created by [Alex Polubiec](http://www.github.com/paloobi).
 
-
 ##Attribution
 
 This project uses the following libraries, APIs and frameworks:
@@ -17,3 +16,5 @@ This project uses the following libraries, APIs and frameworks:
 - D3 for data visualizations
 - FSG generator (built by FullStack Academy)
 - Comic Vine API
+- Bootstrap
+- Bootswatch templates
