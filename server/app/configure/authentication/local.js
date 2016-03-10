@@ -3,7 +3,7 @@ var passport = require('passport');
 var _ = require('lodash');
 var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
-var User = mongoose.model('User');
+// var User = mongoose.model('User');
 
 module.exports = function (app) {
 
