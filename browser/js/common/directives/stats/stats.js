@@ -31,12 +31,18 @@ function makePieChart(stats) {
 
   function getData(stats) {
     var data = [];
+    var color;
 
     for (var stat in stats) {
-      if (['female', 'male', 'other'].indexOf(stat) > -1) {
+
+      if (stat ==='female' || stat === 'male' || stat === 'other') {
+        if (stat === 'female') color = '#158cba';
+        else if (stat === 'male') color = '#28b62c';
+        else color = '#ff851b';
         data.push({
           "label": stat,
-          "value": stats[stat]
+          "value": stats[stat],
+          "color": color
         })
       }
     }
