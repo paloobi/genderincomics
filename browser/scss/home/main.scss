@@ -4,8 +4,11 @@
     flex-wrap: wrap;
     justify-content: space-around;
   }
-  stats {
-
+  svg {
+    display: block;
+    float: left;
+    height: 320px;
+    width: 320px;
   }
   logo {
     padding-top: 30px;
