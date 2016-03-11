@@ -10,38 +10,28 @@ var fs = require('fs');
 var requestPromise = Promise.promisify(request, {multiArgs: true})
 
 var comics = require('../server/env').COMIC_VINE;
-var query = '&format=json&filter=gender:';
+var query = '&format=json&field_list=gender&filter=gender:';
+var headers = { 'User-Agent': 'paloobi' }
+
 
 var females = requestPromise({
   url: comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + 'female',
-  headers: {
-    'User-Agent': 'paloobi'
-  }
+  headers: headers
 })
-// .then(function(results) {
-//   var res = JSON.parse(results[1]);
-//   var numFemale = res.number_of_total_results;
-//   console.log('FEMALE: ' + numFemale)
-// })
-// .catch(console.log)
-
 
 var males = requestPromise({
   url: comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + 'male',
-  headers: {
-    'User-Agent': 'paloobi'
-  }
+  headers: headers
 })
-
 
 var other = requestPromise({
   url: comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + 'other',
-  headers: {
-    'User-Agent': 'paloobi'
-  }
+  headers: headers
 })
 
-module.exports = Promise.all([females, males, other])
+var stats;
+
+var overallGenderRepresentation = Promise.all([females, males, other])
 .then(function(results) {
   console.log(chalk.green('\nRetrieved results from API\n--------------------------'));
   return results.map(function(result) {
@@ -54,17 +44,21 @@ module.exports = Promise.all([females, males, other])
     return Number(val);
   });
   var total = counts[0] + counts[1] + counts[2];
-  var stats = {
+  stats = {
     female: counts[0],
     male: counts[1],
     other: counts[2]
   }
-  return stats;
-})
-.then(function(stats) {
   stats.name = 'total';
-  return GenderCount.create(stats);
+  return GenderCount.findOne({name: stats.name});
+})
+.then(function(statsFromDB) {
+  if (!statsFromDB) return GenderCount.create(stats);
+  statsFromDB.set(stats);
+  return statsFromDB.save();
 })
 .then(function(genderCount){
   console.log(chalk.green('\nWrote GenderCount to DB:\n\nFEMALE: ' + genderCount.female + "\nMALE: " + genderCount.male + "\nOTHER: " + genderCount.other + "\n"));
 })
+
+module.exports = overallGenderRepresentation;
