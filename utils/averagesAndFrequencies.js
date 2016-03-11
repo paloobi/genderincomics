@@ -6,6 +6,9 @@ var Promise = require('bluebird');
 var chalk = require('chalk');
 var requestSync = require('sync-request');
 
+// CHANGE OFFSET TO GET LATER DATA AND ADD TO DB
+var startFromOffset = 0;
+
 var fs = require('fs');
 
 // promisify async methods
@@ -14,12 +17,6 @@ var requestPromise = Promise.promisify(request, {multiArgs: true})
 var comics = require('../server/env').COMIC_VINE;
 var query = '&format=json&field_list=count_of_issue_appearances,api_detail_url&filter=gender:';
 var headers = { 'User-Agent': 'apolubi' }
-
-
-var femalesStart = requestPromise({
-  url: comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + 'female',
-  headers: headers
-})
 
 var malesStart = requestPromise({
   url: comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + 'male',
@@ -31,12 +28,6 @@ var otherStart = requestPromise({
   headers: headers
 })
 
-function callAPIs ( url, APIs ) {
-  var API = APIs.shift();
-  request({ url: url, headers: headers }, function(res, body) { 
-
-  });
-}
 
 // average # issue appearances by gender
 var averageAppearances = {"name": "numIssues"}
@@ -50,66 +41,106 @@ var originFrequency = {"name": "origins", "female": {}, "male": {}, "other": {}}
 // frequency of each power by gender
 var powersFrequency = {"name": "powers", "female": {}, "male": {}, "other": {}}
 
-function getData(gender, total) {
-  var offset = 0;
+
+function delay(ms) {
+    var curr_time = new Date();
+    var curr_ticks = curr_time.getTime();
+    var ms_passed = 0;
+    while(ms_passed < ms) {
+        var now = new Date();  // Possible memory leak?
+        var ticks = now.getTime();
+        ms_passed = ticks - curr_ticks;
+        now = null;  // Prevent memory leak?
+    }
+}
+
+function getData(gender) {
+  var offset = startFromOffset;
   var numCharacters = 0;
   var totalIssues = 0;
   var totalDeaths = 0;
+  
+  var urlToRequest = comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + gender;
+
+  var firstRequest = JSON.parse( requestSync('GET', urlToRequest, { headers: headers }).body.toString() );
+  var total = firstRequest.number_of_total_results;
+
   while (offset < total) {
-    offset += 100;
-    var appearances = JSON.parse(requestSync('GET',
-      comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + gender + '&offset=' + offset,
-      { headers: headers }).body.toString());
-    console.log(appearances)
-    totalIssues += appearances.results.reduce(function(sum, character) {
 
-      // add their origin to the list
-      if (!originFrequency[gender][character.origin]) originFrequency[gender][character.origin] = 0;
-      originFrequency[gender][character.origin]++;
-      
-      // grab character info for death and powers stats
-      var characterURL = character.api_detail_url + '?api_key=' + comics.API_KEY + '&format=json&field_list=issues_died_in,powers&filter=gender:' + gender;
-      console.log(characterURL);
-      var characterFromAPI = JSON.parse(requestSync('GET', characterURL).body).toString();
+    // request the next batch of data, announce which batch it is
+    console.log("Querying " + gender + " at offset: " + offset);
+   
+    var urlToRequest = comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + gender;
+    if (offset > 0) urlToRequest += '&offset=' + offset;
     
-      // add deaths to the deathCount
-      totalDeaths += characterFromAPI.issues_died_in;
+    var appearances = JSON.parse( requestSync('GET', urlToRequest, { headers: headers }).body.toString() );
+    
+    appearances.results.forEach(function(sum, character) {
       
-      // count frequency of powers for this gender
-      if (typeof characterFromAPI.powers === 'string') characterFromAPI.powers = characterFromAPI.powers.split("\n").map(function(val) { return val.trim(); })
-      characterFromAPI.powers.forEach(function(power){
-        if (!powersFrequency[gender][characterFromAPI.power]) powersFrequency[gender][characterFromAPI.power] = 0;
-        powersFrequency[gender][characterFromAPI.power]++;
-      })
+      if (character.api_detail_url) {
 
-      // add their issue count to the total
-      return sum + character.count_of_issue_appearances;
-    }, totalIssues) 
+        // delay required for rate limiting
+        delay(1000);
+
+        // grab character info for death and powers stats
+        var characterURL = character.api_detail_url + '?api_key=' + comics.API_KEY + '&format=json&field_list=issues_died_in,powers&filter=gender:' + gender;
+
+        try {
+
+          var characterFromAPI = JSON.parse( requestSync('GET', characterURL, { headers: headers }).body.toString() );
+          console.log(chalk.green('grabbed character data... parsing...'))
+          
+          // increase number of characters so far
+          numCharacters++;
+
+          // add their issue count to the total
+          totalIssues += character.count_of_issue_appearances
+
+          // add their origin to the list
+          if (!originFrequency[gender][character.origin]) originFrequency[gender][character.origin] = 0;
+          originFrequency[gender][character.origin]++;
+
+          // add deaths to the deathCount
+          totalDeaths += characterFromAPI.results.issues_died_in.length;
+
+          // update averages
+          averageAppearances[gender] = totalIssues / numCharacters;
+          averageDeaths[gender] = totalDeaths / numCharacters;
+          
+          // count frequency of powers for this gender
+          var powerList = characterFromAPI.results.powers;
+          powerList.forEach(function(power){
+            if (!powersFrequency[gender][power.name]) powersFrequency[gender][power.name] = 0;
+            powersFrequency[gender][power.name]++;
+          })
+
+        } catch(e) {
+            console.log(chalk.red(e.message + ": errored on a character request"));
+        }
+
+      }
+
+    })
+
+    offset += 100;
   }
-  averageAppearances[gender] = totalIssues / total;
-  averageDeaths[gender] = totalDeaths / total;
+
+
+  console.log(chalk.green('FINISHED'));
 }
 
-var numIssues = Promise.all([femalesStart, malesStart, otherStart])
-.then(function(results) {
-  console.log(chalk.green('\nRetrieved initial results from API\n--------------------------'));
-  return results.map(function(result) {
-    var res = JSON.parse(result[1]);
-    return res;
-  });
-})
-.then(function(counts){
+getData('female');
+getData('male');
+getData('other');
 
-  getData('female', counts[0].number_of_total_results);
-  getData('male', counts[1].number_of_total_results);
-  getData('other', counts[2].number_of_total_results);
-
-  // check if Appearance stat already in DB
-  return GenderCount.findOne({name: "numIssues"});
+// Once data retrieved,
+// check if Appearance stat already in DB
+GenderCount.findOne({name: "numIssues"});
 })
 .then(function(numIssues) {
   if (!numIssues) return GenderCount.create(averageAppearances);
   else {
+    // NEED TO UPDATE AVERAGE USING NEW AVERAGE DATA RECEIVED
     numIssues.set(averageAppearances);
     return numIssues.save();
   }
@@ -124,6 +155,7 @@ var numIssues = Promise.all([femalesStart, malesStart, otherStart])
 .then(function(numDeaths) {
   if (!numDeaths) return GenderCount.create(averageDeaths);
   else {
+    // NEED TO UPDATE AVERAGE USING NEW AVERAGE DATA RECEIVED
     numDeaths.set(averageDeaths);
     return numDeaths.save()
   }
@@ -162,7 +194,9 @@ var numIssues = Promise.all([femalesStart, malesStart, otherStart])
 
   process.kill(1);
 })
-.catch(console.log)
+.catch(function(err) {
+  console.log(err.stack)
+})
 
 
 module.exports = numIssues;

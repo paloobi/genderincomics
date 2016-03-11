@@ -15,6 +15,10 @@ var schema = new mongoose.Schema({
     },
     other: {
         type: Number
+    },
+    dataPoints: {
+        type: Number,
+        required: true
     }
 });
 
