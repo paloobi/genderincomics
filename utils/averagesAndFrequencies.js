@@ -91,7 +91,8 @@ function getData(gender) {
 
   var firstRequest = JSON.parse( requestSync('GET', urlToRequest, { headers: headers }).body.toString() );
   var total = firstRequest.number_of_total_results;
-
+  console.log(total);
+  
   while (offset < total) {
 
     // request the next batch of data, announce which batch it is
@@ -105,6 +106,7 @@ function getData(gender) {
     appearances.results.forEach(function(sum, character) {
       
       if (character.api_detail_url) {
+        console.log('HELLO')
 
         // delay required for rate limiting
         delay(1000);
@@ -145,7 +147,7 @@ function getData(gender) {
 
           // Once data retrieved
           // check if Appearance stat already in DB
-          GenderCount.findOne({name: "numIssues"});
+          GenderCount.findOne({name: "numIssues"})
           .then(function(numIssues) {
             if (!numIssues) return GenderCount.create(averageAppearances);
             else {
