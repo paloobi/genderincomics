@@ -37,7 +37,7 @@ app.factory('PieChart', function(){
             })
             .showLabels(true);
 
-        d3.select("#overall svg")
+        d3.select("#" + stats.name + " svg")
               .datum(getData(stats))
               .transition().duration(350)
               .call(chart);

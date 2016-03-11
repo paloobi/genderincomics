@@ -2,26 +2,32 @@ app.factory('StatFactory', function($http) {
 
   var Stats = {};
 
-  Stats.getOverall = function() {
-    return $http.get('/api/stats/overall')
+  Stats.getStats = function(title) {
+    console.log(title);
+    return $http.get('/api/stats/' + title)
       .then(function(res) {
         return res.data; 
       });
   }
   return Stats;
 
-})
+});
 
 app.directive('stats', function(StatFactory, PieChart) {
   return {
     restrict: 'E',
     templateUrl: 'js/common/directives/stats/stats.html',
-    scope: {},
+    scope: {
+      title: "@"
+    },
     link: function(scope) {
       scope.stats = {};
-      StatFactory.getOverall().then(function(stats){
-        scope.stats.overall = stats;
+      StatFactory.getStats(scope.title)
+      .then(function(stats){
+        // console.log(stats);
+        scope.stats[scope.title] = stats;
         PieChart.create(stats);
+        scope.$digest();
       })
     }
   }
