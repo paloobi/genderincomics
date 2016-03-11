@@ -10,6 +10,7 @@ var fs = require('fs');
 var requestPromise = Promise.promisify(request, {multiArgs: true})
 
 var comics = require('../server/env').COMIC_VINE;
+
 var query = '&format=json&filter=gender:';
 
 var females = requestPromise({
@@ -18,12 +19,7 @@ var females = requestPromise({
     'User-Agent': 'paloobi'
   }
 })
-// .then(function(results) {
-//   var res = JSON.parse(results[1]);
-//   var numFemale = res.number_of_total_results;
-//   console.log('FEMALE: ' + numFemale)
-// })
-// .catch(console.log)
+
 
 
 var males = requestPromise({
