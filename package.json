@@ -6,6 +6,7 @@
   "scripts": {
     "start": "nodemon --watch server -e js,html server/start.js",
     "postinstall": "gulp build",
+    "processBatch": "node utils/getData.js",
     "seed": "node utils/run.js"
   },
   "engines": {

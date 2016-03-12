@@ -8,13 +8,34 @@ var requestPromise = Promise.promisify(request, {multiArgs: true})
 var mongoose = require('mongoose');
 var Character = require('../server/db/models').Character;
 
+// synchronous requests used to handle offset and rate limits
+var requestSync = require('sync-request');
+
 // offset from which to start the API calls
-var offset = 10000;
+var initialOffset = Number(process.env.START) || 0;
+var offset = initialOffset;
+// when to stop making new API calls - if not specified, will get all
+var total;
+
+
+if (process.env.END) {
+  total = Number(process.env.END);
+} else {
+  var urlToRequest = comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query;
+  var firstRequest = JSON.parse( requestSync('GET', urlToRequest, { headers: headers }).body.toString() );
+  var total = firstRequest.number_of_total_results;
+  console.log(chalk.green("Successfully got first API result"));
+}
+
+console.log(chalk.green("Will now query for " + total + " characters starting with " + offset))
+
 
 // set URL to query
 var comics = require('../server/env').COMIC_VINE;
 var query = '&format=json&field_list=id,count_of_issue_appearances,gender,origin,publisher,name,real_name&sort=name:asc';
 var headers = { 'User-Agent': 'apolubi' }
+
+
 
 function delay(ms) {
     var curr_time = new Date();
@@ -27,15 +48,6 @@ function delay(ms) {
         now = null;  // Prevent memory leak?
     }
 }
-
-// making synchronous requests to handle offset and rate limits
-var requestSync = require('sync-request');
-
-// var urlToRequest = comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query;
-// var firstRequest = JSON.parse( requestSync('GET', urlToRequest, { headers: headers }).body.toString() );
-var total = 20000;
-// var total = firstRequest.number_of_total_results;
-console.log(chalk.green("Successfully got first API result - will now query for all " + total + " characters"))
 
 // results list from API calls
 var apiCalls = [];
@@ -52,7 +64,11 @@ while (offset < total) {
   if (offset > 0) nextURL += '&offset=' + offset;
   console.log("Querying at offset: " + offset + " - GET " + nextURL);
 
-  apiCalls.push( JSON.parse( requestSync('GET', nextURL, { headers: headers }).body.toString() ) );
+  try {
+    apiCalls.push( JSON.parse( requestSync('GET', nextURL, { headers: headers }).body.toString() ) );
+  } catch(e) {
+    console.log(chalk.red('hit an error: ' + e.message))
+  }
   console.log(chalk.green('succeeded in querying API at offset ' + offset + "\n"))
   offset += 100;
 
@@ -77,9 +93,7 @@ startDb.then(function() {
 
   // create promise to update or create each character in DB
   characters.forEach(function(character) {
-    console.log(character);
     if (character) {
-
       // grab data that exists
       var charData = {}
       if (character.name) charData.name = character.name;
@@ -104,14 +118,14 @@ startDb.then(function() {
 
       // push promise to list of promises
       dbOpers.push(charPromise);
-
     }
+
   })
 
   return Promise.all(dbOpers);
 })
 .then(function(characters) {
-  console.log(chalk.green("SUCCEEDED: db was seeded with characters from API"));
+  console.log(chalk.green("SUCCEEDED: db was seeded with characters from API: " + initialOffset + "-" + total));
   process.kill(1);
 })
 .catch(function(err) {
