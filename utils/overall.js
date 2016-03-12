@@ -28,6 +28,7 @@ var other = requestPromise({
   url: comics.BASE_URL + '/characters/?api_key=' + comics.API_KEY + query + 'other',
   headers: headers
 })
+console.log(other);
 
 var stats;
 
