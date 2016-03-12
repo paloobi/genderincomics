@@ -1,27 +1,25 @@
 app.factory('PieChart', function(){
 
-  function getData(stats) {
-    var data = [];
-    var color;
-
-    for (var stat in stats) {
-
-      if (stat ==='female' || stat === 'male' || stat === 'other') {
-        data.push({
-          "label": stat,
-          "value": stats[stat],
-          "color": colors[stat]
-        })
-      }
-    }
-    return data;
-  }
-
 
   var colors = {
     female: "#00ff00",
     male: "#ff0000",
     other: "#0000ff"
+  }
+
+  function getData(stats) {
+    var data = [];
+    var color;
+
+    for (var stat in stats) {
+      data.push({
+        "label": stat,
+        "value": stats[stat],
+        "color": colors[stat]
+      })
+    }
+    
+    return data;
   }
 
   return {
@@ -37,7 +35,7 @@ app.factory('PieChart', function(){
             })
             .showLabels(true);
 
-        d3.select("#" + stats.name + " svg")
+        d3.select("#gender svg")
               .datum(getData(stats))
               .transition().duration(350)
               .call(chart);

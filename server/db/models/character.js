@@ -16,6 +16,6 @@ var schema = new mongoose.Schema({
 });
 
 
-mongoose.model('Character', schema);
+var Character = mongoose.model('Character', schema);
 
-module.exports = mongoose.model('Character');
+module.exports = Character;
