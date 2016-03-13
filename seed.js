@@ -175,7 +175,7 @@ function calculateFrequency (type) {
       for (var publisher in stats) {
 
         // ignore if not enough data
-        if (!stats[publisher].female.length || !stats[publisher].male.length || !stats[publisher].other.length) break;
+        if (!stats[publisher].female.length || !stats[publisher].male.length) break;
 
         (function(obj) {
             var pubStats = { publisher: obj.publisher };
