@@ -32,7 +32,7 @@ function calculatePercent () {
         characters.forEach(function (char) {
             // add to overall tally
             if (!stats.overall) stats.overall = {
-                publisher: 'overall',female: 0, male: 0, other: 0
+                publisher: 'overall', female: 0, male: 0, other: 0
             }; 
             stats.overall[char.gender]++;
 
@@ -46,10 +46,9 @@ function calculatePercent () {
         });
 
         var dbPromises = [];
-        for (var stat in stats) {
+        for (var publisher in stats) {
             // promise to save to DB
             ( function(obj) { 
-                console.log(obj.publisher);
                 dbPromises.push( models.Percent.findOne({ publisher: obj.publisher })
                     .then(function(statFromDB) {
                         if (!statFromDB) {
@@ -62,7 +61,7 @@ function calculatePercent () {
                         }
                     })
                 )
-            })(stats[stat]);
+            })(stats[publisher]);
         }
         return Promise.all(dbPromises);
     })
@@ -77,14 +76,14 @@ function calculateIssues() {
         characters.forEach(function (char) {
 
             // add to overall stats
-            if (!stats.overall) stats[overall] = {
+            if (!stats.overall) stats.overall = {
                 publisher: 'overall',
                 female: { sum: 0, dataPoints: 0 },
                 male: { sum: 0, dataPoints: 0 },
                 other: { sum: 0, dataPoints: 0 }
             };
             stats.overall[char.gender].sum += char.issueCount;
-            stats.overall[char.gender].dataPoints++
+            stats.overall[char.gender].dataPoints++;
 
             // add to publisher tally
             if (char.publisher) {
@@ -101,21 +100,26 @@ function calculateIssues() {
         });
 
         var dbPromises = [];
-        for (var stat in stats) {
+
+        for (var publisher in stats) {
             // calculate averages
-            for (var gender in stats[stat]) {
-                if (gender !== 'publisher') stats[stat][gender] = stats[stat][gender].sum / stats[stat][gender].dataPoints;
-            }
-            // promise to save to DB
-            dbPromises.push( models.Issues.findOne({publisher: stats[stat].publisher})
-                .then(function(statFromDB) {
-                    if (!statFromDB) models.Issues.create(stats[stat]);
-                    else {
-                        statFromDB.set(stats[stat]);
-                        return statFromDB.save();
-                    }
-                })
-            )
+            ( function(obj) {
+                var statsToSave = { publisher: obj.publisher }
+                statsToSave.female = obj.female.sum / obj.female.dataPoints;
+                statsToSave.male = obj.male.sum / obj.male.dataPoints;
+                statsToSave.other = obj.other.sum / obj.other.dataPoints;
+                
+                // promise to save to DB
+                dbPromises.push( models.Issues.findOne({publisher: obj.publisher})
+                    .then(function(statFromDB) {
+                        if (!statFromDB) models.Issues.create(statsToSave);
+                        else {
+                            statFromDB.set(statsToSave);
+                            return statFromDB.save();
+                        }
+                    })
+                )
+            })(stats[publisher]);
         }
         return Promise.all(dbPromises);
     })
@@ -125,56 +129,70 @@ function calculateIssues() {
 }
 
 function calculateFrequency (type) {
-    var modelToUse = type === "origins" ? models.Origins : models.Names; 
+    var modelToUse;
+    if (type === "origins") modelToUse = models.Origins;
+    if (type === "names") modelToUse = models.Names; 
 
     return Character.find()
     .then(function(characters) {
+
         var stats = {};
         characters.forEach(function(character) {
 
-        // add to overall
-        if (!stats.overall) stats.overall = {
-            publisher: "overall", female: [], male: [], other: []
-        };
-        if (!stats.overall[char.gender][character[type]]) stats.overall[char.gender][character[type]] = 0;
-        stats.overall[char.gender][character[type]]++;
-
-        // add to publisher count
-        if (char.publisher) {
-            if (!stats[char.publisher]) stats[char.publisher] = {
-                publisher: char.publisher, female: [], male: [], other: []
+            // add to overall
+            if (!stats.overall) stats.overall = {
+                publisher: "overall", female: [], male: [], other: []
             };
-            if (!stats[char.publisher][char.gender][character[type]]) stats[char.publisher][char.gender][char[type]] = 0;
-            stats[char.publisher][char.gender][char[type]]++;
-        }
+            if (!stats.overall[char.gender][character[type]]) stats.overall[char.gender][character[type]] = 0;
+            stats.overall[char.gender][character[type]]++;
+
+            // add to publisher count
+            if (char.publisher) {
+                if (!stats[char.publisher]) stats[char.publisher] = {
+                    publisher: char.publisher, female: [], male: [], other: []
+                };
+                if (!stats[char.publisher][char.gender][character[type]]) stats[char.publisher][char.gender][char[type]] = 0;
+                stats[char.publisher][char.gender][char[type]]++;
+            }
 
       });
 
       var arr;
       var promises = [];
-      for (var pub in stats) {
 
-        var pubStats = { publisher: stats[pub].publisher };
-        // find top 10 for each gender
-        ['female', 'male', 'other'].forEach(function(gender) {
-            arr = [];
-            for (key in stats[pub][gender]) {
-                arr.push({ name: key, count: stats[pub][gender][key] });
-            }
-            arr.sort(function(a, b) { return b.count - a.count; });
-            pubStats[gender] = arr.slice(0,11);
-        })
+      function getTop10 (obj, gender) {
+        arr = [];
+        for (key in obj) {
+            arr.push({ name: key, count: obj[gender][key] });
+        }
+        console.log('top 10 for ' + gender + ": " + arr);
+        arr.sort(function(a, b) { return b.count - a.count; });
+        return arr.slice(0,11);
+      }
 
-        //push promise to save this set of stats to DB
-        promises.push( modelToUse.findOne({publisher: pubStats.publisher })
-            .then(function(stats) {
-                if (!stats) return modelToUse.create ( pubStats );
-                else {
-                    stats.set( pubStats );
-                    return stats.save();
-                }
-            })
-        )
+      // create promises to save stats to DB
+      for (var publisher in stats) {
+
+        (function(obj) {
+
+            var pubStats = { publisher: obj.publisher };
+        
+            // find top 10 for each gender
+            ['female', 'male', 'other'].forEach(function(gender) {
+                pubStats[gender] = getTop10(obj, gender);
+            });
+
+            //push promise to save this set of stats to DB
+            promises.push( modelToUse.findOne({publisher: pubStats.publisher })
+                .then(function(statsFromDB) {
+                    if (!statsFromDB) return modelToUse.create ( pubStats );
+                    else {
+                        stats.set( pubStats );
+                        return stats.save();
+                    }
+                })
+            )
+        })(stats[publisher]);
 
       }
 
