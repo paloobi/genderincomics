@@ -103,12 +103,13 @@ function calculateIssues() {
             // calculate averages
             ( function(obj) {
                 var statsToSave = { publisher: obj.publisher }
-                statsToSave.female = obj.female.sum / obj.female.dataPoints;
-                statsToSave.male = obj.male.sum / obj.male.dataPoints;
-                statsToSave.other = obj.other.sum / obj.other.dataPoints;
+                statsToSave.female = obj.female.dataPoints && obj.female.sum ? obj.female.sum / obj.female.dataPoints : 0;
+                statsToSave.male = obj.male.dataPoints && obj.male.sum ? obj.male.sum / obj.male.dataPoints : 0;
+                statsToSave.other = obj.other.dataPoints && obj.other.sum ? obj.other.sum / obj.other.dataPoints : 0;
                 
                 // promise to save to DB
-                dbPromises.push( models.Issues.findOne({publisher: obj.publisher})
+                dbPromises.push( models.Issues
+                    .findOne({publisher: obj.publisher})
                     .then(function(statFromDB) {
                         if (!statFromDB) models.Issues.create(statsToSave);
                         else {
@@ -168,6 +169,7 @@ function calculateFrequency (type) {
             if (key) arr.push({ name: key, count: unsorted[gender][key] });
         }
         arr.sort(function(a, b) { return b.count - a.count; });
+        // console.log(arr);
         return arr.length > 10 ? arr.slice(0,11) : arr;
       }
 
@@ -176,8 +178,10 @@ function calculateFrequency (type) {
 
         // ignore if not enough data
         if (!stats[publisher].female.length || !stats[publisher].male.length) break;
-
+        console.log(stats[publisher]);
+        
         (function(obj) {
+            // console.log(obj)
             var pubStats = { publisher: obj.publisher };
 
             // find top 10 for each gender
@@ -217,12 +221,12 @@ connectToDb
 })
 .then(function(issueStats) {
     console.log(chalk.green("Saved " + issueStats.length + " Issues Stats to DB"));
-    return calculateFrequency('origins');
-})
-.then(function(originStats) {
-    console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
     return calculateFrequency('names');
 })
+// .then(function(originStats) {
+//     console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
+//     return calculateFrequency('names');
+// })
 .then(function(nameStats) {
     console.log(chalk.green("Saved " + nameStats.length + " Name frequencies Stats to DB"));
     console.log(chalk.green("DONE SEEDING THE DB"));
