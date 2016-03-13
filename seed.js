@@ -21,38 +21,214 @@ var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var chalk = require('chalk');
 var connectToDb = require('./server/db');
-var User = Promise.promisifyAll(mongoose.model('User'));
 
-var seedUsers = function () {
+var models = require('./server/db/models');
+var Character = models.Character;
 
-    var users = [
-        {
-            email: 'testing@fsa.com',
-            password: 'password'
-        },
-        {
-            email: 'obama@gmail.com',
-            password: 'potus'
+function calculatePercent () {
+    
+    return Character.find().then(function(characters){
+        var stats = {};
+        characters.forEach(function (char) {
+            // add to overall tally
+            if (!stats.overall) stats.overall = {
+                publisher: 'overall', female: 0, male: 0, other: 0
+            }; 
+            stats.overall[char.gender]++;
+
+            // add to publisher tally
+            if (char.publisher) {
+                if (!stats[char.publisher]) stats[char.publisher] = {
+                    publisher: char.publisher, female: 0, male: 0, other: 0
+                };
+                stats[char.publisher][char.gender]++;
+            }
+        });
+
+        var dbPromises = [];
+        for (var publisher in stats) {
+            // promise to save to DB
+            ( function(obj) { 
+                dbPromises.push( models.Percent.findOne({ publisher: obj.publisher })
+                    .then(function(statFromDB) {
+                        if (!statFromDB) {
+                            return models.Percent.create(obj);
+                        } else {
+                            statFromDB.set(obj);
+                            return statFromDB.save();
+                        }
+                    })
+                )
+            })(stats[publisher]);
         }
-    ];
+        return Promise.all(dbPromises);
+    })
+    .catch(function(err) {
+        console.log(chalk.red("Error while saving Percent to DB: " + err.stack));
+    })
+}
 
-    return User.createAsync(users);
+function calculateIssues() {
+    return Character.find().then(function(characters){
+        var stats = {};
+        characters.forEach(function (char) {
 
-};
+            // add to overall stats
+            if (!stats.overall) stats.overall = {
+                publisher: 'overall',
+                female: { sum: 0, dataPoints: 0 },
+                male: { sum: 0, dataPoints: 0 },
+                other: { sum: 0, dataPoints: 0 }
+            };
+            stats.overall[char.gender].sum += char.issueCount;
+            stats.overall[char.gender].dataPoints++;
 
-connectToDb.then(function () {
-    User.findAsync({}).then(function (users) {
-        if (users.length === 0) {
-            return seedUsers();
-        } else {
-            console.log(chalk.magenta('Seems to already be user data, exiting!'));
-            process.kill(0);
+            // add to publisher tally
+            if (char.publisher) {
+                if (!stats[char.publisher]) stats[char.publisher] = {
+                    publisher: char.publisher,
+                    female: { sum: 0, dataPoints: 0 },
+                    male: { sum: 0, dataPoints: 0 },
+                    other: { sum: 0, dataPoints: 0 }
+                };
+                stats[char.publisher][char.gender].sum += char.issueCount;
+                stats[char.publisher][char.gender].dataPoints++;
+            }
+
+        });
+
+        var dbPromises = [];
+
+        for (var publisher in stats) {
+            // calculate averages
+            ( function(obj) {
+                var statsToSave = { publisher: obj.publisher }
+                statsToSave.female = obj.female.sum / obj.female.dataPoints;
+                statsToSave.male = obj.male.sum / obj.male.dataPoints;
+                statsToSave.other = obj.other.sum / obj.other.dataPoints;
+                
+                // promise to save to DB
+                dbPromises.push( models.Issues.findOne({publisher: obj.publisher})
+                    .then(function(statFromDB) {
+                        if (!statFromDB) models.Issues.create(statsToSave);
+                        else {
+                            statFromDB.set(statsToSave);
+                            return statFromDB.save();
+                        }
+                    })
+                )
+            })(stats[publisher]);
         }
-    }).then(function () {
-        console.log(chalk.green('Seed successful!'));
-        process.kill(0);
-    }).catch(function (err) {
-        console.error(err);
-        process.kill(1);
-    });
-});
+        return Promise.all(dbPromises);
+    })
+    .catch(function(err) {
+        console.log(chalk.red("Error saving Issues to DB: " + err.stack));
+    })
+}
+
+function calculateFrequency (type) {
+    var modelToUse;
+    if (type === "origins") modelToUse = models.Origins;
+    if (type === "names") modelToUse = models.Names; 
+
+    return Character.find()
+    .then(function(characters) {
+
+        var stats = {};
+        characters.forEach(function(char) {
+            var value = char[type.slice(0, type.length - 1)];
+            if (type === "names") value = value.split(" ")[0].toLowerCase();
+
+            if (value) {
+                // add to overall
+                if (!stats.overall) stats.overall = {
+                    publisher: "overall", female: [], male: [], other: []
+                };
+                if (!stats.overall[char.gender][value]) stats.overall[char.gender][value] = 0;
+                stats.overall[char.gender][value]++;
+
+                // add to publisher count
+                if (char.publisher) {
+                    if (!stats[char.publisher]) stats[char.publisher] = {
+                        publisher: char.publisher, female: [], male: [], other: []
+                    };
+                    if (!stats[char.publisher][char.gender][value]) stats[char.publisher][char.gender][value] = 0;
+                    stats[char.publisher][char.gender][value]++;
+                }
+            }
+
+      });
+
+      var arr;
+      var promises = [];
+
+      function getTop10 (unsorted, gender) {
+        arr = [];
+        for (key in unsorted[gender]) {
+            if (key) arr.push({ name: key, count: unsorted[gender][key] });
+        }
+        arr.sort(function(a, b) { return b.count - a.count; });
+        return arr.length > 10 ? arr.slice(0,11) : arr;
+      }
+
+      // create promises to save stats to DB
+      for (var publisher in stats) {
+
+        // ignore if not enough data
+        if (!stats[publisher].female.length || !stats[publisher].male.length) break;
+
+        (function(obj) {
+            var pubStats = { publisher: obj.publisher };
+
+            // find top 10 for each gender
+            ['female', 'male', 'other'].forEach(function(gender) {
+                pubStats[gender] = getTop10(obj, gender);
+            });
+
+            //push promise to save this set of stats to DB
+            promises.push( modelToUse.findOne({publisher: pubStats.publisher })
+                .then(function(statsFromDB) {
+                    if (!statsFromDB) return modelToUse.create ( pubStats );
+                    else {
+                        statsFromDB.set( pubStats );
+                        return statsFromDB.save();
+                    }
+                })
+            )
+
+        })(stats[publisher]);
+
+      }
+
+      return Promise.all( promises );
+    })
+    .catch(function(err){
+        console.log(chalk.red("Error while saving Origins to DB: " + err.stack));
+    })
+}
+
+connectToDb
+.then(function () {
+    return calculatePercent();
+})
+.then(function(percentStats) {
+    console.log(chalk.green("Saved " + percentStats.length + " Percent Stats to DB"));
+    return calculateIssues();
+})
+.then(function(issueStats) {
+    console.log(chalk.green("Saved " + issueStats.length + " Issues Stats to DB"));
+    return calculateFrequency('origins');
+})
+.then(function(originStats) {
+    console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
+    return calculateFrequency('names');
+})
+.then(function(nameStats) {
+    console.log(chalk.green("Saved " + nameStats.length + " Name frequencies Stats to DB"));
+    console.log(chalk.green("DONE SEEDING THE DB"));
+    process.kill(0);
+})
+.catch(function(err) {
+    console.log(chalk.red(err.message + "FAILED TO SEED DB"));
+    process.kill(1);
+})
