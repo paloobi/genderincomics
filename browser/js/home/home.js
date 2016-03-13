@@ -11,14 +11,20 @@ app.config(function ($stateProvider) {
     });
 });
 
-app.controller('StatsPage', function($scope, PieChart, statistics) {
-  console.log(statistics)
-  $scope.percent = statistics[0][0];
-  $scope.issues = statistics[1][0];
-  $scope.names = statistics[2][0];
-  $scope.origins = statistics[3][0];
+app.controller('StatsPage', function($scope, BarChart, statistics) {
+  var percentStats = statistics[0],
+    issueStats = statistics[1],
+    nameStats = statistics[2],
+    originStats = statistics[3];
 
-  console.log($scope.percent);
+  $scope.percent = _.find(percentStats, {publisher: 'DC Comics'});
+  $scope.issues = _.find(issueStats, {publisher: 'London Editions Magazines'});
+  $scope.names = _.find(nameStats, {publisher: 'overall'});
+  $scope.origins = _.find(originStats, {publisher: 'overall'});
 
-  PieChart.create($scope.percent);
+  // console.log($scope.percent);
+
+  console.log($scope.issues);
+  BarChart.create($scope.issues);
+  // PieChart.create($scope.percent);
 })
