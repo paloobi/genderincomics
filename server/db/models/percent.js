@@ -45,12 +45,16 @@ schema.statics.calculate = function () {
 
         var dbPromises = [];
         for (var stat in stats) {
+            // promise to save to DB
             dbPromises.push( this.create(stats[stat]) );
         }
         return Promise.all(dbPromises);
     })
     .then(function() {
         console.log(chalk.green("Successfully calculated and seeded new percents"))
+    })
+    .catch(function(err) {
+        console.log(chalk.red("Failed to Save to DB"));
     })
 }
 
