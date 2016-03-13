@@ -48,16 +48,21 @@ function calculatePercent () {
         var dbPromises = [];
         for (var stat in stats) {
             // promise to save to DB
-            console.log(stats[stat])
-            dbPromises.push( models.Percent.findOne({publisher: stats[stat].publisher})
-                .then(function(statFromDB) {
-                    if (!statFromDB) return models.Percent.create(stats[stat]);
-                    else {
-                        statFromDB.set(stats[stat]);
-                        return statFromDB.save();
-                    }
-                })
-            )
+            ( function(obj) { 
+                console.log(obj.publisher);
+                dbPromises.push( models.Percent.findOne({ publisher: obj.publisher })
+                    .then(function(statFromDB) {
+                        if (!statFromDB) {
+                            console.log('creating new for ' + obj.publisher);
+                            return models.Percent.create(obj);
+                        } else {
+                            console.log('changing old for ' + obj.publisher);
+                            statFromDB.set(obj);
+                            return statFromDB.save();
+                        }
+                    })
+                )
+            })(stats[stat]);
         }
         return Promise.all(dbPromises);
     })
