@@ -17,7 +17,7 @@ router.get('/issues', function(req, res, next) {
 })
 
 router.get('/origins', function(req, res, next) {
-  models.Issues.find()
+  models.Origins.find()
   .then(function(stats) {
     res.json(stats);
   })

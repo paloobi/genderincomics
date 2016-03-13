@@ -33,8 +33,6 @@ app.controller('Home', function($scope, $rootScope, $state) {
 
 app.controller('StatsPage', function($scope, PieChart, BarChart, statistics) {
 
-  console.log('this controller isn\'t loading');
-
   var percentStats = statistics[0],
     issueStats = statistics[1],
     nameStats = statistics[2],
@@ -42,13 +40,16 @@ app.controller('StatsPage', function($scope, PieChart, BarChart, statistics) {
 
   $scope.publisher = "overall";
 
-  $scope.percent = _.find(percentStats, {publisher: 'overall'});
-  $scope.issues = _.find(issueStats, {publisher: 'overall'});
-  $scope.origins = _.find(originStats, {publisher: 'overall'});
+  $scope.percent = _.find(percentStats, {publisher: $scope.publisher});
+  $scope.issues = _.find(issueStats, {publisher: $scope.publisher});
+  $scope.origins = _.find(originStats, {publisher: $scope.publisher});
+  $scope.names = _.find(nameStats, {publisher: $scope.publisher});
 
-  // console.log($scope.percent);
+  console.log($scope.percent);
+  console.log($scope.issues);
+  console.log($scope.origins);
+  console.log($scope.names);
 
-  // console.log($scope.issues);
   PieChart.create($scope.percent);
   BarChart.create($scope.issues);
   

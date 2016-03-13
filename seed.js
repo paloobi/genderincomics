@@ -25,16 +25,16 @@ var connectToDb = require('./server/db');
 var models = require('./server/db/models');
 var Character = models.Character;
 
-// add ability to clean empty values from an array
-Array.prototype.clean = function(deleteValue) {
-  for (var i = 0; i < this.length; i++) {
-    if (this[i] === deleteValue) {         
-      this.splice(i, 1);
-      i--;
-    }
-  }
-  return this;
-};
+// // add ability to clean empty values from an array
+// Array.prototype.clean = function(deleteValue) {
+//   for (var i = 0; i < this.length; i++) {
+//     if (this[i] === deleteValue) {         
+//       this.splice(i, 1);
+//       i--;
+//     }
+//   }
+//   return this;
+// };
 
 function calculatePercent () {
     
@@ -184,7 +184,7 @@ function calculateFrequency (type) {
                 arr.push({ name: key, count: unsorted[gender][key] });
             }
         }
-        if (type === "names") console.log(arr);
+        if (type === "origins") console.log(arr);
         arr.sort(function(a, b) { return b.count - a.count; });
         return arr.length > 10 ? arr.slice(0,11) : arr.slice();
       }
@@ -195,7 +195,7 @@ function calculateFrequency (type) {
       for (var publisher in stats) {
 
         // ignore if not enough data
-        if (type === 'names') console.log(stats[publisher]);
+        if (type === 'origins') console.log(stats[publisher]);
         if (!Object.keys(stats[publisher].female).length || !Object.keys(stats[publisher].male).length) {
             continue;
         }
