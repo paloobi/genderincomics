@@ -31,18 +31,35 @@ var schema = new mongoose.Schema({
     }    
 });
 
-schema.statics.calculate = function (publisher) {
-    var stats = {publisher: publisher};
-    Character.find({publisher: publisher})
+schema.statics.calculate = function () {
+    var stats = {};
+    Character.find()
     .then(function(characters) {
       characters.forEach(function(character) {
-        if (!stats[character.origins]) stats[character.origins] = 0;
-        stats[character.origins]++;
+
+        // add to overall
+        if (!stats.overall) stats.overall = { publisher: "overall", female: [], male: [], other: [] };
+        if (!stats.overall[char.gender][character.origins]) stats.overall[char.gender][character.origins] = 0;
+        stats.overall[char.gender][character.origins]++;
+
+        // add to publisher count
+        if (char.publisher) {
+            if (!stats[char.publisher]) stats[char.publisher] = { publisher: char.publisher, female: [], male: [], other: [] };
+            if (!stats[char.publisher][char.gender][character.origins]) stats[char.publisher][char.gender][char.origins] = 0;
+            stats[char.publisher][char.gender][char.origins]++;
+        }
+
       });
-      
+
     })
 }
-schema.statics.getByPublisher = counters.getByPublisher;
+
+schema.statics.getOverall = function() {
+    return this.findOne({publisher: 'overall'});
+}
+schema.statics.getByPublisher = function(publisher) {
+    return this.findOne({publisher: publisher});
+}
 
 mongoose.model('Origins', schema);
 
