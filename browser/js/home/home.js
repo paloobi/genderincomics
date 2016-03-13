@@ -17,6 +17,8 @@ app.controller('StatsPage', function($scope, PieChart, BarChart, statistics) {
     nameStats = statistics[2],
     originStats = statistics[3];
 
+  $scope.publisher = "overall";
+
   $scope.percent = _.find(percentStats, {publisher: 'DC Comics'});
   $scope.issues = _.find(issueStats, {publisher: 'London Editions Magazines'});
   $scope.names = _.find(nameStats, {publisher: 'overall'});

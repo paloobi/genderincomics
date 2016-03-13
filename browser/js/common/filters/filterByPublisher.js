@@ -1,0 +1,3 @@
+app.filter('byPublisher', function() {
+  
+})
