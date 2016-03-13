@@ -8,13 +8,16 @@
     align-content: space-around;
   }
 
+
   .stat-panel {
     width: 600px;
     padding: 60px;
-  }
-
-  h2 {
-    margin-bottom: 20px;
+    p {
+      margin-bottom: 30px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
   }
 
   .ct-label {
@@ -25,6 +28,13 @@
       font-family: arial;
       font-weight: bold;
   }
+
+  @media screen and (max-width: 600px) {
+    .ct-label {
+      font-size: 10px;
+    }
+  }
+
   .ct-slice-pie {
     stroke: white;
     stroke-width: 4px;
