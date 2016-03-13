@@ -1,1 +1,0 @@
-var Character = require('./character');
