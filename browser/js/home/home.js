@@ -4,18 +4,18 @@ app.config(function ($stateProvider) {
         templateUrl: 'js/home/home.html',
         controller: 'StatsPage',
         resolve: {
-          characters: function(StatFactory) {
-            return StatFactory.getCharacters() 
+          statistics: function(StatFactory) {
+            return StatFactory.getData();
           }
         }
     });
 });
 
-app.controller('StatsPage', function($scope, characters, PieChart) {
-    var stats = {}
-    characters.forEach(function(character) {
-      if (!stats[character.gender]) stats[character.gender] = 0;
-      stats[character.gender]++;
-    })
-    PieChart.create(stats);
+app.controller('StatsPage', function($scope, PieChart, statistics) {
+  $scope.percent = statistics[0];
+  $scope.issues = statistics[1];
+  $scope.names = statistics[2];
+  $scope.origins = statistics[3];
+
+  PieChart.create($scope.percent);
 })
