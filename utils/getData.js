@@ -18,6 +18,11 @@ var offset = initialOffset;
 var total;
 
 
+// set URL to query
+var comics = require('../server/env').COMIC_VINE;
+var query = '&format=json&field_list=id,count_of_issue_appearances,gender,origin,publisher,name,real_name&sort=name:asc';
+var headers = { 'User-Agent': 'apolubi' }
+
 if (process.env.END) {
   total = Number(process.env.END);
 } else {
@@ -28,13 +33,6 @@ if (process.env.END) {
 }
 
 console.log(chalk.green("Will now query for " + total + " characters starting with " + offset))
-
-
-// set URL to query
-var comics = require('../server/env').COMIC_VINE;
-var query = '&format=json&field_list=id,count_of_issue_appearances,gender,origin,publisher,name,real_name&sort=name:asc';
-var headers = { 'User-Agent': 'apolubi' }
-
 
 
 function delay(ms) {
