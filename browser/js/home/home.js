@@ -11,7 +11,7 @@ app.config(function ($stateProvider) {
     });
 });
 
-app.controller('StatsPage', function($scope, BarChart, statistics) {
+app.controller('StatsPage', function($scope, PieChart, BarChart, statistics) {
   var percentStats = statistics[0],
     issueStats = statistics[1],
     nameStats = statistics[2],
@@ -24,7 +24,7 @@ app.controller('StatsPage', function($scope, BarChart, statistics) {
 
   // console.log($scope.percent);
 
-  console.log($scope.issues);
+  // console.log($scope.issues);
+  PieChart.create($scope.percent);
   BarChart.create($scope.issues);
-  // PieChart.create($scope.percent);
 })
