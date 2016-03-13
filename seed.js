@@ -137,10 +137,9 @@ function calculateFrequency (type) {
         var stats = {};
         characters.forEach(function(char) {
             var value = char[type.slice(0, type.length - 1)];
-            if (type === "names") value = value.split(" ")[0];
+            if (type === "names") value = value.split(" ")[0].toLowerCase();
 
             if (value) {
-                console.log(value);
                 // add to overall
                 if (!stats.overall) stats.overall = {
                     publisher: "overall", female: [], male: [], other: []
@@ -163,13 +162,11 @@ function calculateFrequency (type) {
       var arr;
       var promises = [];
 
-      function getTop10 (obj, gender) {
+      function getTop10 (unsorted, gender) {
         arr = [];
-        // console.log(obj);
-        for (key in obj) {
-            arr.push({ name: key, count: obj[gender][key] });
+        for (key in unsorted[gender]) {
+            if (key) arr.push({ name: key, count: unsorted[gender][key] });
         }
-        // console.log('top 10 for ' + gender + ": " + arr[0].name + arr[0].count);
         arr.sort(function(a, b) { return b.count - a.count; });
         return arr.length > 10 ? arr.slice(0,11) : arr;
       }
@@ -188,14 +185,13 @@ function calculateFrequency (type) {
                 pubStats[gender] = getTop10(obj, gender);
             });
 
-
             //push promise to save this set of stats to DB
             promises.push( modelToUse.findOne({publisher: pubStats.publisher })
                 .then(function(statsFromDB) {
                     if (!statsFromDB) return modelToUse.create ( pubStats );
                     else {
-                        stats.set( pubStats );
-                        return stats.save();
+                        statsFromDB.set( pubStats );
+                        return statsFromDB.save();
                     }
                 })
             )
