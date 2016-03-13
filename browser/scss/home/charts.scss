@@ -1,0 +1,66 @@
+#home {
+  .ct-label {
+      fill: #fff;
+      color: #000;
+      font-size: 16px;
+      line-height: 1;
+      font-family: arial;
+      font-weight: bold;
+  }
+
+  @media screen and (max-width: 600px) {
+    .ct-label {
+      font-size: 10px;
+    }
+  }
+  #issues {
+    line:nth-child(1) {
+      stroke: hsl(240, 60%, 50%)
+    } 
+    line:nth-child(2) {
+      stroke: hsl(0, 60%, 50%);
+    }
+    line:nth-child(3) {
+      stroke: hsl(120, 60%, 50%);
+    }
+  }
+
+  .ct-slice-pie {
+    stroke: white;
+    stroke-width: 4px;
+  }
+  .femalePercent {
+    .ct-slice-pie {
+      fill: hsl(240, 60%, 50%);
+    }
+  }
+  .malePercent {
+    .ct-slice-pie {
+      fill: hsl(0, 60%, 50%);
+    }
+  }
+  .otherPercent {
+    background-color: #0000ff;
+    .ct-slice-pie {
+      fill: hsl(120, 60%, 50%);
+    }
+  }
+  .legend {
+    margin-top: 10px;
+    div {
+      width: 12px;
+      height: 12px;
+      border-radius: 100%;
+      display: inline-block;
+    }
+    .femalePercent {
+      background-color: hsl(240, 60%, 50%);
+    }
+    .malePercent {
+      background-color: hsl(0, 60%, 50%);
+    }
+    .otherPercent {
+      background-color: hsl(120, 60%, 50%);
+    }
+  }
+}
