@@ -223,10 +223,10 @@ connectToDb
     console.log(chalk.green("Saved " + issueStats.length + " Issues Stats to DB"));
     return calculateFrequency('origins');
 })
-.then(function(originStats) {
-    console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
-    return calculateFrequency('names');
-})
+// .then(function(originStats) {
+//     console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
+//     return calculateFrequency('names');
+// })
 .then(function(nameStats) {
     console.log(chalk.green("Saved " + nameStats.length + " Name frequencies Stats to DB"));
     console.log(chalk.green("DONE SEEDING THE DB"));
