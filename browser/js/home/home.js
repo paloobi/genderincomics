@@ -12,10 +12,13 @@ app.config(function ($stateProvider) {
 });
 
 app.controller('StatsPage', function($scope, PieChart, statistics) {
-  $scope.percent = statistics[0];
-  $scope.issues = statistics[1];
-  $scope.names = statistics[2];
-  $scope.origins = statistics[3];
+  console.log(statistics)
+  $scope.percent = statistics[0][0];
+  $scope.issues = statistics[1][0];
+  $scope.names = statistics[2][0];
+  $scope.origins = statistics[3][0];
+
+  console.log($scope.percent);
 
   PieChart.create($scope.percent);
 })

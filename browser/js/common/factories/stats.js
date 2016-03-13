@@ -4,12 +4,12 @@ app.factory('StatFactory', function($http, $q) {
 
   Stats.getData = function(){
     
-    var percent = $http.get('/api/' + percent).then(function(res) { return res.data; })
-    var issues = $http.get('/api/' + issues).then(function(res) { return res.data; })
-    var names = $http.get('/api/' + names).then(function(res) { return res.data; })
-    var origins = $http.get('/api/' + origins).then(function(res) { return res.data; })
+    var percent = $http.get('/api/stats/percent').then(function(res) { return res.data; })
+    var issues = $http.get('/api/stats/issues').then(function(res) { return res.data; })
+    var names = $http.get('/api/stats/names').then(function(res) { return res.data; })
+    var origins = $http.get('/api/stats/origins').then(function(res) { return res.data; })
 
-    return $q.all(percent, issues, names, origins);
+    return $q.all([percent, issues, names, origins]);
   }
 
   return Stats;
