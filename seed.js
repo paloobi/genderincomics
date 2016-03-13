@@ -221,7 +221,7 @@ connectToDb
 })
 .then(function(issueStats) {
     console.log(chalk.green("Saved " + issueStats.length + " Issues Stats to DB"));
-    return calculateFrequency('origins');
+    return calculateFrequency('names');
 })
 // .then(function(originStats) {
 //     console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
