@@ -211,24 +211,24 @@ connectToDb
 .then(function () {
     return calculatePercent();
 })
-.then(function() {
-    console.log(chalk.green("Saved Percent to DB"));
+.then(function(percentStats) {
+    console.log(chalk.green("Saved " + percentStats.length + " Percent Stats to DB"));
     return calculateIssues();
 })
-.then(function() {
-    console.log(chalk.green("Saved Issues to DB"));
+.then(function(issueStats) {
+    console.log(chalk.green("Saved " + issueStats.length + " Issues Stats to DB"));
     return calculateFrequency('origins');
 })
-.then(function() {
-    console.log(chalk.green('Saved Origin frequencies to DB'));
+.then(function(originStats) {
+    console.log(chalk.green('Saved ' + originStats.length + ' Origin frequencies Stats to DB'));
     return calculateFrequency('names');
 })
-.then(function() {
-    console.log(chalk.green("Saved Name frequencies to DB"));
+.then(function(nameStats) {
+    console.log(chalk.green("Saved " + nameStats.length + " Name frequencies Stats to DB"));
     console.log(chalk.green("DONE SEEDING THE DB"));
-    process.kill(1);
+    process.kill(0);
 })
 .catch(function(err) {
     console.log(chalk.red(err.message + "FAILED TO SEED DB"));
-    process.kill(0);
+    process.kill(1);
 })
