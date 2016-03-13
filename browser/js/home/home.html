@@ -1,7 +1,56 @@
 <section id="home">
+  
+  <div class="jumbotron text-center">
+    <h1>Gender in Comics</h1>
+    <p>An analysis of gender-related trends in comic books, based on data retrieved from the Comic Vine API.</p>
+  </div>
 
   <div class="stats">
-    <stats ng-repeat="title in availableStats" title="{{title}}"></stats>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h2 class="panel-title text-center">Overall Representation</h2>
+      </div>
+      <div class="panel-body">
+        <div id="gender">
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h2 class="panel-title text-center">Average Number of Issues</h2>
+      </div>
+      <div class="panel-body">
+        <div id="appearances">
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h2 class="panel-title text-center">Top 5 Origins</h2>
+      </div>
+      <div class="panel-body">
+        <div id="origin">
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h2 class="panel-title text-center">Top 5 First Names</h2>
+      </div>
+      <div class="panel-body">
+        <div id="alteregos">
+          <svg></svg>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </section>
