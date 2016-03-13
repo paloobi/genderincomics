@@ -1,0 +1,33 @@
+<div class="stats">
+
+  <div class="stat-panel">
+    <h2 class="text-center">Overall Representation</h2>
+    <p class="text-center">Number of characters in this category of each gender</p>
+    <div id="percent" class="ct-chart ct-golden-section"></div>
+    <div class="legend text-center">
+      <div class="femalePercent"></div> Female: {{percent.female}}
+      <div class="malePercent"></div> Male: {{percent.male}}
+      <div class="otherPercent"></div> Other/Not Specified: {{percent.other}}
+    </div>
+  </div>
+
+  <div class="stat-panel">
+    <h2 class="text-center">Average Number of Issues</h2>
+    <p class="text-center">Average number of issues per character, broken down by gender</p>
+    <div class="ct-chart ct-golden-section" id="issues"></div>
+  </div>
+
+  <div class="stat-panel">
+    <h2 class="text-center">Top Character Origins</h2>
+    <p class="text-center">Most frequenctly occuring character origins, broken down by gender.</p>
+    <div id="origins" class="ct-chart ct-golden-section"></div>
+  </div>
+
+  <div class="stat-panel" ng-show="publisher==='overall'">
+    <h2 class="text-center">Top Character Names</h2>
+    <p class="text-center">Most frequently occuring first names of alter egos, broken down by gender.</p>
+    <p>
+    <div id="names" class="ct-chart ct-golden-section"></div>
+  </div>
+
+</div>

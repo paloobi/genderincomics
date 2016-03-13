@@ -1,24 +1,29 @@
+@import 'loading';
+
 #home {
   .stats {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    align-content: space-around;
   }
+
   .stat-panel {
     width: 600px;
+    padding: 60px;
   }
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
   .ct-label {
       fill: #fff;
       color: #000;
-      font-size: 14px;
+      font-size: 16px;
       line-height: 1;
       font-family: arial;
       font-weight: bold;
-  }
-  .ct-chart-pie {
-    .ct-label {
-      font-size: 20px;
-    }
   }
   .ct-slice-pie {
     stroke: white;
@@ -41,6 +46,7 @@
     }
   }
   .legend {
+    margin-top: 10px;
     div {
       width: 12px;
       height: 12px;
@@ -69,6 +75,15 @@
   .ct-series-a .ct-bar {
     stroke: red;
     stroke-width: 40px;
+  }
+  .statsFilters {
+    display: flex;
+    justify-content: space-around;
+    margin-left: 200px;
+    margin-right: 200px;
+    h4 {
+      display: inline-block;
+    }
   }
 }
 
