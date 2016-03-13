@@ -4,11 +4,58 @@
     flex-wrap: wrap;
     justify-content: space-around;
   }
-  svg {
-    display: block;
-    float: left;
-    height: 320px;
-    width: 320px;
+  .stat-panel {
+    width: 600px;
+  }
+  .ct-label {
+      fill: #fff;
+      color: #000;
+      font-size: 14px;
+      line-height: 1;
+      font-family: arial;
+      font-weight: bold;
+  }
+  .ct-chart-pie {
+    .ct-label {
+      font-size: 20px;
+    }
+  }
+  .ct-slice-pie {
+    stroke: white;
+    stroke-width: 4px;
+  }
+  .femalePercent {
+    .ct-slice-pie {
+      fill: hsl(240, 60%, 50%);
+    }
+  }
+  .malePercent {
+    .ct-slice-pie {
+      fill: hsl(0, 60%, 50%);
+    }
+  }
+  .otherPercent {
+    background-color: #0000ff;
+    .ct-slice-pie {
+      fill: hsl(120, 60%, 50%);
+    }
+  }
+  .legend {
+    div {
+      width: 12px;
+      height: 12px;
+      border-radius: 100%;
+      display: inline-block;
+    }
+    .femalePercent {
+      background-color: hsl(240, 60%, 50%);
+    }
+    .malePercent {
+      background-color: hsl(0, 60%, 50%);
+    }
+    .otherPercent {
+      background-color: hsl(120, 60%, 50%);
+    }
   }
   logo {
     padding-top: 30px;
@@ -18,6 +65,10 @@
   h1 {
     margin-top: 40px;
     text-align: center;
+  }
+  .ct-series-a .ct-bar {
+    stroke: red;
+    stroke-width: 40px;
   }
 }
 
