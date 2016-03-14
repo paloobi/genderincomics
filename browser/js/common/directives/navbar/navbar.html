@@ -5,8 +5,8 @@
                 <a href="/home"><span class="fa fa-female"></span><span class="fa fa-male"></span></a>
             </div>
         </div>
-        <span class="navbar-nav display-menu"><a href=""><span class="fa fa-stack-1x"></span>></a></span>
-        <ul class="nav navbar-nav pull-right options">
+<!--         <span class="navbar-nav display-menu"><a href=""><span class="fa fa-stack-1x"></span>></a></span>
+ -->        <ul class="nav navbar-nav pull-right options">
             <li class="navbar-item" ng-repeat="item in items" ng-show="!item.auth || isLoggedIn()">
                 <a class="navbar-link" ui-sref-active="active" ui-sref="{{ item.state }}">{{ item.label }}</a>
             </li>
