@@ -1,19 +1,29 @@
 @import 'loading';
 @import 'charts';
 
+@media screen and (max-width: 600px) {
+  hr {
+    display: block;
+  }
+  .display-menu {
+    float: right;
+  }
+  .options {
+    display: none;
+  }
+}
+@media screen and (min-width: 601px) {
+  hr {
+    display: none;
+  }
+  .display-menu {
+    display: none;
+  }
+  .options {
+    display: block;
+  }
+}
 #home {
-
-  @media screen and (max-width: 600px) {
-    hr {
-      display: block;
-    }
-  }
-  
-  @media screen and (min-width: 601px) {
-    hr {
-      display: none;
-    }
-  }
   .stats {
     display: flex;
     flex-wrap: wrap;
@@ -80,6 +90,21 @@
   .ct-series-a .ct-bar {
     stroke: red;
     stroke-width: 40px;
+  }
+  @media screen and (min-width: 601px) {
+    .statsFilters {
+      flex-direction: horizontal;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    .statsFilters {
+      flex-direction: vertical;
+      flex-wrap: wrap;
+      h4, button {
+        display: block !important;
+        margin-top: 10px;
+      }
+    }
   }
   .statsFilters {
     display: flex;
