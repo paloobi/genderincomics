@@ -1,6 +1,7 @@
 'use strict';
 var router = require('express').Router();
 var models = require('../../../db/models');
+var _ = require('lodash');
 
 router.get('/percent', function(req, res, next){
   models.Percent.find()
@@ -25,7 +26,7 @@ router.get('/origins', function(req, res, next) {
 
 router.get('/names', function(req, res, next) {
   models.Names.find()
-  .then(function(stats){ 
+  .then(function(stats){
     res.json(stats);
   })
 })

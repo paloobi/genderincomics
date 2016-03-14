@@ -17,12 +17,14 @@ name in the environment files.
 
 */
 
+var supportedPublishers = [ "Marvel", "DC Comics", "Dark Horse Comics", "Disney", "Image Comics" ]
+
 var mongoose = require('mongoose');
 var Promise = require('bluebird');
 var chalk = require('chalk');
-var connectToDb = require('./server/db');
+var connectToDb = require('../server/db');
 
-var models = require('./server/db/models');
+var models = require('../server/db/models');
 var Character = models.Character;
 
 // // add ability to clean empty values from an array
@@ -152,8 +154,18 @@ function calculateFrequency (type) {
 
         var stats = {};
         characters.forEach(function(char) {
-            var value = char[type.slice(0, type.length - 1)];
-            if (type === "names") value = value.split(" ")[0].toLowerCase();
+            var key = type.slice(0, type.length - 1)
+            var value = char[key];
+            if (type === "names") {
+                var words = value.split(" ");
+                if (words.length > 1) {
+                    value = words[0].toLowerCase() === 'the' ? words[1].toLowerCase() : words[0].toLowerCase();
+                } else if (words.length) {
+                    value = words[0].toLowerCase();
+                } else {
+                    value = "";
+                }
+            }
 
             if (value && typeof value === 'string') {
                 // add to overall
@@ -164,7 +176,7 @@ function calculateFrequency (type) {
                 stats.overall[char.gender][value]++;
 
                 // add to publisher count
-                if (char.publisher) {
+                if (supportedPublishers.indexOf( char.publisher ) > -1) {
                     if (!stats[char.publisher]) stats[char.publisher] = {
                         publisher: char.publisher, female: [], male: [], other: []
                     };
@@ -184,7 +196,6 @@ function calculateFrequency (type) {
                 arr.push({ name: key, count: unsorted[gender][key] });
             }
         }
-        if (type === "origins") console.log(arr);
         arr.sort(function(a, b) { return b.count - a.count; });
         return arr.length > 10 ? arr.slice(0,11) : arr.slice();
       }
@@ -195,20 +206,17 @@ function calculateFrequency (type) {
       for (var publisher in stats) {
 
         // ignore if not enough data
-        if (type === 'origins') console.log(stats[publisher]);
         if (!Object.keys(stats[publisher].female).length || !Object.keys(stats[publisher].male).length) {
             continue;
         }
         
         (function(obj) {
-            // console.log(obj)
             var pubStats = { publisher: obj.publisher };
 
             // find top 10 for each gender
             ['female', 'male', 'other'].forEach(function(gender) {
                 pubStats[gender] = getTop10(obj, gender);
             });
-            if (type === 'origins') console.log(pubStats);
             //push promise to save this set of stats to DB
             promises.push( modelToUse
                 .findOne({publisher: pubStats.publisher })

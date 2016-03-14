@@ -7,7 +7,7 @@
     "start": "nodemon --watch server -e js,html server/start.js",
     "postinstall": "gulp build",
     "processBatch": "node utils/getData.js",
-    "seed": "node utils/getData.js && node seed.js"
+    "seed": "node utils/getData.js && node processData.js"
   },
   "engines": {
     "node": ">=4.0.0"
