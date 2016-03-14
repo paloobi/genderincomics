@@ -1,60 +1,70 @@
+@import 'loading';
+@import 'charts';
+
 #home {
+
+  @media screen and (max-width: 600px) {
+    hr {
+      display: block;
+    }
+  }
+  
+  @media screen and (min-width: 601px) {
+    hr {
+      display: none;
+    }
+  }
   .stats {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    align-content: space-around;
   }
+
   .stat-panel {
     width: 600px;
-  }
-  .ct-label {
-      fill: #fff;
-      color: #000;
-      font-size: 14px;
-      line-height: 1;
-      font-family: arial;
-      font-weight: bold;
-  }
-  .ct-chart-pie {
-    .ct-label {
-      font-size: 20px;
+    padding: 60px;
+    p {
+      margin-bottom: 30px;
     }
-  }
-  .ct-slice-pie {
-    stroke: white;
-    stroke-width: 4px;
-  }
-  .femalePercent {
-    .ct-slice-pie {
-      fill: hsl(240, 60%, 50%);
+    h2 {
+      margin-bottom: 20px;
     }
-  }
-  .malePercent {
-    .ct-slice-pie {
-      fill: hsl(0, 60%, 50%);
+    h3 {
+      margin-top: 0;
     }
-  }
-  .otherPercent {
-    background-color: #0000ff;
-    .ct-slice-pie {
-      fill: hsl(120, 60%, 50%);
+    ol {
+      padding-left: 0;
+      li {
+        list-style: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
     }
-  }
-  .legend {
-    div {
-      width: 12px;
-      height: 12px;
-      border-radius: 100%;
-      display: inline-block;
-    }
-    .femalePercent {
-      background-color: hsl(240, 60%, 50%);
-    }
-    .malePercent {
-      background-color: hsl(0, 60%, 50%);
-    }
-    .otherPercent {
-      background-color: hsl(120, 60%, 50%);
+    .top10 {
+      display: flex;
+      justify-content: space-between;
+      span {
+        color: white;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        width: 92px;
+        padding: 2px;
+        font-size: 14px;
+        padding: 4px;
+        font-size: 14px;
+        border-radius: 4px;
+        display: inline-block;
+      }
+      span.female {
+        background-color: $femaleColor;
+      }
+      span.male {
+        background-color: $maleColor;
+      }
+      span.other {
+        background-color: $otherColor;
+      }
     }
   }
   logo {
@@ -69,6 +79,15 @@
   .ct-series-a .ct-bar {
     stroke: red;
     stroke-width: 40px;
+  }
+  .statsFilters {
+    display: flex;
+    justify-content: space-around;
+    margin-left: 200px;
+    margin-right: 200px;
+    h4 {
+      display: inline-block;
+    }
   }
 }
 

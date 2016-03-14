@@ -1,7 +1,9 @@
 <nav class="navbar navbar-default navbar-static-top">
     <div class="container">
         <div class="navbar-header">
-            <logo></logo>
+            <div class="navbar-brand">
+                <a href="/home"><span class="fa fa-venus-mars"></span></a>
+            </div>
         </div>
         <ul class="nav navbar-nav pull-right">
             <li class="navbar-item" ng-repeat="item in items" ng-show="!item.auth || isLoggedIn()">

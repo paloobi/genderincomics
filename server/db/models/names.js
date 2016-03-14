@@ -26,7 +26,6 @@ var schema = new mongoose.Schema({
     },
     other: {
         type: [countObj],
-        required: true
     }
 });
 

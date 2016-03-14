@@ -8,6 +8,14 @@ app.config(function ($urlRouterProvider, $locationProvider) {
     $urlRouterProvider.otherwise('/');
 });
 
+app.filter('capitalize', function() {
+  return function(input) {
+      return input.split(" ").map(function(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }).join(" ");
+   }
+});
+
 // This app.run is for controlling access to specific states.
 app.run(function ($rootScope, AuthService, $state) {
 

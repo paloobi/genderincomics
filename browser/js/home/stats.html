@@ -1,0 +1,62 @@
+<div class="statsFilters" role="group" aria-label="filter-by-publisher">
+  <h4>Filters</h4>
+  <button type="button" class="btn btn-default" name="Marvel" ng-click="toggleFilter('overall')">View All</button>
+  <button type="button" class="btn btn-primary" name="Marvel" ng-click="toggleFilter('Marvel')">Marvel Comics</button>
+  <button type="button" class="btn btn-info" name="DC" ng-click="toggleFilter('DC Comics')">DC Comics</button>
+  <button type="button" class="btn btn-success" name="Image" ng-click="toggleFilter('Image')">Image Comics</button>
+  <button type="button" class="btn btn-danger" name="Dark Horse" ng-click="toggleFilter('Dark Horse Comics')">Dark Horse Comics</button>
+  <button type="button" class="btn btn-warning" name="Disney" ng-click="toggleFilter('Disney')">Disney</button>
+</div>
+
+<div class="stats">
+
+  <div class="stat-panel">
+    <h2 class="text-center">Overall Representation</h2>
+    <p class="text-center">Number of characters in this category of each gender</p>
+    <div id="percent" class="ct-chart ct-golden-section"></div>
+    <div class="legend text-center">
+      <div class="femalePercent"></div> Female: {{percent.female}}
+      <div class="malePercent"></div> Male: {{percent.male}}
+      <div class="otherPercent"></div> Other/Not Specified: {{percent.other}}
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="stat-panel">
+    <h2 class="text-center">Average Number of Issues</h2>
+    <p class="text-center">Average number of issues per character, broken down by gender</p>
+    <div class="ct-chart ct-golden-section" id="issues"></div>
+  </div>
+
+  <hr>
+
+  <div class="stat-panel">
+    <h2 class="text-center">Top Character Origins</h2>
+    <p class="text-center">Most frequenctly occuring types of character origins, broken down by gender.</p>
+    <div id="origins" class="top10">
+      <div ng-repeat="gender in ['female', 'male', 'other']" class="genderList">
+        <h3>{{gender | capitalize}}</h3>
+          <ol>
+            <li ng-repeat="origin in origins[gender] | orderBy: '-count' | limitTo: 10 "><span class="{{gender}}">{{origin.name}}</span> x {{origin.count}}</li>
+          </ol>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="stat-panel">
+    <h2 class="text-center">Top Character Names</h2>
+    <p class="text-center">Most frequently occuring first names/titles of alter egos, broken down by gender.</p>
+    <div id="names" class="top10">
+      <div ng-repeat="gender in ['female', 'male', 'other']" class="genderList">
+        <h3>{{gender | capitalize}}</h3>
+          <ol>
+            <li ng-repeat="name in names[gender] | orderBy : '-count' | limitTo: 10"><span class="{{gender}}">{{name.name | capitalize}}</span> x {{name.count}}</li>
+          </ol>
+      </div>
+    </div>
+  </div>
+
+</div>
