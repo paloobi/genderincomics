@@ -66,10 +66,11 @@ app.controller('StatsPage', function($scope, PieChart, BarChart, statistics, $lo
     if (value === 'overall') $location.search('publisher', null);
     if ($location.search().publisher === encodeURI(value) ) {
       $location.search('publisher', null);
+      $scope.publisher = 'overall';
     } else {
       $location.search('publisher', encodeURI(value) );
+      $scope.publisher = value;
     }
-    $scope.publisher = value;
     $scope.percent = _.find(percentStats, {publisher: $scope.publisher});
     $scope.issues = _.find(issueStats, {publisher: $scope.publisher});
     $scope.origins = _.find(originStats, {publisher: $scope.publisher});

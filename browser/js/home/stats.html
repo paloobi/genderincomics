@@ -8,11 +8,13 @@
   <button type="button" class="btn btn-warning" name="Disney" ng-click="toggleFilter('Disney')">Disney</button>
 </div>
 
+<h1 class="text-center"><span ng-show="publisher === 'overall'">All</span><span ng-show="publisher !== 'overall'">{{publisher | capitalize}}</span> Characters</h1>
+
 <div class="stats">
 
   <div class="stat-panel">
-    <h2 class="text-center">Overall Representation</h2>
-    <p class="text-center">Number of characters in this category of each gender</p>
+    <h2 class="text-center">Representation</h2>
+    <p class="text-center">Number of characters of each gender</p>
     <div id="percent" class="ct-chart ct-golden-section"></div>
     <div class="legend text-center">
       <div class="femalePercent"></div> Female: {{percent.female}}
