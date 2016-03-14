@@ -76,7 +76,6 @@ app.controller('StatsPage', function($scope, PieChart, BarChart, statistics, $lo
     $scope.names = _.find(nameStats, {publisher: $scope.publisher});
     PieChart.create($scope.percent);
     BarChart.create($scope.issues);
-    $location.reload();
   }
 
   $scope.percent = _.find(percentStats, {publisher: $scope.publisher});
