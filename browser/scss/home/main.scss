@@ -2,6 +2,18 @@
 @import 'charts';
 
 #home {
+
+  @media screen and (max-width: 600px) {
+    hr {
+      display: block;
+    }
+  }
+  
+  @media screen and (min-width: 601px) {
+    hr {
+      display: none;
+    }
+  }
   .stats {
     display: flex;
     flex-wrap: wrap;
@@ -17,6 +29,42 @@
     }
     h2 {
       margin-bottom: 20px;
+    }
+    h3 {
+      margin-top: 0;
+    }
+    ol {
+      padding-left: 0;
+      li {
+        list-style: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+    }
+    .top10 {
+      display: flex;
+      justify-content: space-between;
+      span {
+        color: white;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        width: 92px;
+        padding: 2px;
+        font-size: 14px;
+        padding: 4px;
+        font-size: 14px;
+        border-radius: 4px;
+        display: inline-block;
+      }
+      span.female {
+        background-color: $femaleColor;
+      }
+      span.male {
+        background-color: $maleColor;
+      }
+      span.other {
+        background-color: $otherColor;
+      }
     }
   }
   logo {

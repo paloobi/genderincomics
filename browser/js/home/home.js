@@ -8,7 +8,7 @@ app.config(function ($stateProvider) {
         }
     })
     .state('home.statsSection', {
-      url: '',
+      url: '/',
       templateUrl: 'js/home/stats.html',
       controller: 'StatsPage',
       resolve: {
@@ -19,9 +19,22 @@ app.config(function ($stateProvider) {
     });
 });
 
+app.factory('Publisher', function($location){
 
-app.controller('Home', function($scope, $rootScope, $state) {
-  $scope.loading = true;
+  var publisher = {};
+
+  var currentPublisher = 'overall';
+
+  publisher.getCurrent = function() {
+    return $location.search().length ? $location.search.publisher : 'overall';
+  }
+
+  return publisher;
+})
+
+app.controller('Home', function($scope, $rootScope, $state, $location, Publisher) {
+  
+  if ($scope.loading === undefined) $scope.loading = true;
 
   $rootScope.$on('$stateChangeSuccess', function(event){
     $scope.loading = false;
@@ -31,22 +44,46 @@ app.controller('Home', function($scope, $rootScope, $state) {
 
 })
 
-app.controller('StatsPage', function($scope, PieChart, BarChart, statistics) {
+app.controller('StatsPage', function($scope, PieChart, BarChart, statistics, $location, Publisher) {
 
   var percentStats = statistics[0],
     issueStats = statistics[1],
     nameStats = statistics[2],
     originStats = statistics[3];
 
-  $scope.publisher = "overall";
+  $scope.publisher = Publisher.getCurrent();
+
+  // set publisher from URI query strings if any
+  if ($location.search().length) {
+    if ($location.search().publisher) {
+      $scope.publisher = decodeURI($location.search().publisher);
+    }
+  } else {
+    $scope.publisher = "overall";
+  }
+
+  $scope.toggleFilter = function(value) {
+    if (value === 'overall') $location.search('publisher', null);
+    if ($location.search().publisher === encodeURI(value) ) {
+      $location.search('publisher', null);
+    } else {
+      $location.search('publisher', encodeURI(value) );
+    }
+    $scope.publisher = value;
+    $scope.percent = _.find(percentStats, {publisher: $scope.publisher});
+    $scope.issues = _.find(issueStats, {publisher: $scope.publisher});
+    $scope.origins = _.find(originStats, {publisher: $scope.publisher});
+    $scope.names = _.find(nameStats, {publisher: $scope.publisher});
+    PieChart.create($scope.percent);
+    BarChart.create($scope.issues);
+    $location.reload();
+  }
 
   $scope.percent = _.find(percentStats, {publisher: $scope.publisher});
   $scope.issues = _.find(issueStats, {publisher: $scope.publisher});
   $scope.origins = _.find(originStats, {publisher: $scope.publisher});
   $scope.names = _.find(nameStats, {publisher: $scope.publisher});
 
-  console.log($scope.percent);
-  console.log($scope.issues);
   console.log($scope.origins);
   console.log($scope.names);
 

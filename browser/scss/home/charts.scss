@@ -1,3 +1,7 @@
+$femaleColor: hsl(240, 60%, 50%);
+$maleColor: hsl(0, 60%, 50%);
+$otherColor: hsl(120, 60%, 50%);
+
 #home {
   .ct-label {
       fill: #fff;
@@ -31,18 +35,17 @@
   }
   .femalePercent {
     .ct-slice-pie {
-      fill: hsl(240, 60%, 50%);
+      fill: $femaleColor;
     }
   }
   .malePercent {
     .ct-slice-pie {
-      fill: hsl(0, 60%, 50%);
+      fill: $maleColor;
     }
   }
   .otherPercent {
-    background-color: #0000ff;
     .ct-slice-pie {
-      fill: hsl(120, 60%, 50%);
+      fill: $otherColor;
     }
   }
   .legend {
