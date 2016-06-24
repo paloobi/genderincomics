@@ -4,6 +4,9 @@ An analysis of gender representation in superhero comics, and how gender correla
 
 Created by [Alex Polubiec](http://www.github.com/paloobi).
 
+**Demo:**
+[![link to demo video](http://cloud.fullstackacademy.com/Screen-Shot-2016-03-13-at-10.21.15-PM.png?mtime=20160313222710)](http://www.fullstackacademy.com/hackathon-presentations/super-gender)
+
 ##Setup
 
 To run the app locally:
